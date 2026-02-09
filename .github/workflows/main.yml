@@ -1,0 +1,26 @@
+name: Daily Forex Activity
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every night at midnight
+  workflow_dispatch:      # Allows you to click a button to run it NOW
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write    # This is the "magic" that allows the bot to commit
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - run: pip install feedparser
+      - run: python generate_report.py
+      - name: Commit and Push
+        run: |
+          git config --global user.name "Pirasanna"
+          git config --global user.email "cpirasanna@gmail.com"
+          git add .
+          git commit -m "Update Forex Report: $(date)"
+          git push
